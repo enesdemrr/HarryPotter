@@ -1,59 +1,87 @@
 package com.enes.feature.detail.presentation
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.widget.LinearLayout
+import androidx.core.view.isGone
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
+import coil.load
+import com.enes.common.presentation.BaseFragment
+import com.enes.common.presentation.utils.fragmentViewBinding
+import com.enes.feature.detail.domain.entity.GetCharacterDetailResponseModelEntity
+import com.enes.feature.detail.presentation.component.PairView
+import com.enes.feature.detail.presentation.databinding.FragmentDetailBinding
+import dagger.hilt.android.AndroidEntryPoint
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+@AndroidEntryPoint
+class DetailFragment : BaseFragment(R.layout.fragment_detail) {
+    override val binding by fragmentViewBinding(FragmentDetailBinding::bind)
+    override val viewModel: DetailViewModel by viewModels()
+    private val args: DetailFragmentArgs by navArgs()
+    override fun bindUI() {
+        super.bindUI()
+    }
 
-/**
- * A simple [Fragment] subclass.
- * Use the [DetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class DetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    override fun bindViewModel() {
+        super.bindViewModel()
+        viewModel.getCharacterDetail(args.id)
+        viewModel.characterDetail.observe(viewLifecycleOwner){
+            binding.imageProfile.load(it.image)
+            binding.progressCircular.isGone = true
+            binding.createdDate.text = it.name
+            informationTable(it)
+            locationTable(it)
+        }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    }
+
+
+    private fun informationTable(model: GetCharacterDetailResponseModelEntity) {
+        binding.gridLayoutPersonalInfo.apply {
+            addView(
+                prepareTextView(
+                    Pair("Name", model.name)
+                )
+            )
+            addView(
+                prepareTextView(
+                    Pair("Status", model.house)
+                )
+            )
+            addView(
+                prepareTextView(
+                    Pair("Species", model.patronus)
+                )
+            )
+            addView(
+                prepareTextView(
+                    Pair("Gender", model.gender)
+                )
+            )
         }
     }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_detail, container, false)
+    private fun locationTable(model: GetCharacterDetailResponseModelEntity) {
+        binding.gridLayoutLocation.apply {
+            addView(
+                prepareTextView(
+                    Pair("Name", model.ancestry)
+                )
+            )
+            addView(
+                prepareTextView(
+                    Pair("URL", model.id)
+                )
+            )
+        }
     }
+    private fun prepareTextView(pair: Pair<String, String>): PairView {
+        val pairView = PairView(binding.root.context)
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        pairView.layoutParams = params
+        pairView.setUp(pair.first, pair.second)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        return pairView
     }
 }

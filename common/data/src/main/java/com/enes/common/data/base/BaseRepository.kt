@@ -13,8 +13,8 @@ import retrofit2.Response
 abstract class BaseRepository {
     protected suspend fun <T> safeApiCall(
         dispatcher: CoroutineDispatcher = Dispatchers.IO,
-        call: suspend () -> Response<T>
-    ): Flow<NetworkWrapper<T>> = withContext(dispatcher) {
+        call: suspend () -> Response<List<T>>
+    ): Flow<NetworkWrapper<List<T>>> = withContext(dispatcher) {
         flow {
             val response = call.invoke()
             println("Response: $response")

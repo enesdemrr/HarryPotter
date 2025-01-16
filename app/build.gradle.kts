@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -28,7 +29,7 @@ android {
             )
         }
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding = true
     }
     compileOptions {
@@ -38,7 +39,7 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
-    sourceSets{
+    sourceSets {
         getByName("debug").java.srcDirs("$rootDir/navigation/src/main/sharedRes")
     }
 }
@@ -67,8 +68,9 @@ dependencies {
     implementation(projects.feature.detail.presentation)
 
     implementation(projects.navigation)
-
-
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.analytics)
     //  Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
